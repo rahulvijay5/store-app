@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
-import { Button } from 'react-native-elements';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useUser } from '@clerk/clerk-expo';
-import { useNavigation } from '@react-navigation/native';
-import Cart from '../components/Cart';
-import { Prices, TeaType, TeaSize } from '../constants/prices';
-import { CartItem, TypeOfCart, Counts } from '../types';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Pressable,
+} from "react-native";
+import { Button } from "react-native-elements";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useUser } from "@clerk/clerk-expo";
+import { useNavigation } from "@react-navigation/native";
+import Cart from "../components/Cart";
+import { Prices, TeaType, TeaSize } from "../constants/prices";
+import { CartItem, TypeOfCart, Counts } from "../types";
+import { useRouter } from "expo-router";
+import { SignOutButton } from "../components/SignOutButton";
 
-const API_BASE_URL = 'https://vijaychai.vercel.app/api';
+const API_BASE_URL = "https://vijaychai.vercel.app/api";
 
 const initialCart: CartItem[] = [
   { type: "Regular", size: "250gm", quantity: 0, price: 0 },
@@ -45,8 +53,8 @@ const HomeScreen: React.FC = () => {
           setUserIdInDb(res.message);
         } else {
           console.log("User does not exist, redirecting to add user details");
-        //   navigation.navigate('UpdateDetails');
-          router.replace('/UpdateDetails')
+          //   navigation.navigate('UpdateDetails');
+          router.replace("/UpdateDetails");
         }
       } catch (error) {
         console.log("Error: ", error);
@@ -82,12 +90,18 @@ const HomeScreen: React.FC = () => {
 
   const getIndividualCounts = (cart: TypeOfCart): Counts => {
     const counts: Counts = {
-      Reg250: 0, Reg500: 0, Reg1000: 0,
-      Sup250: 0, Sup500: 0, Sup1000: 0,
+      Reg250: 0,
+      Reg500: 0,
+      Reg1000: 0,
+      Sup250: 0,
+      Sup500: 0,
+      Sup1000: 0,
     };
 
     cart.forEach((item: CartItem) => {
-      const key = `${item.type.charAt(0).toUpperCase() + item.type.slice(1, 3)}${item.size.replace("gm", "")}` as keyof Counts;
+      const key = `${
+        item.type.charAt(0).toUpperCase() + item.type.slice(1, 3)
+      }${item.size.replace("gm", "")}` as keyof Counts;
       counts[key] += item.quantity;
     });
 
@@ -124,17 +138,15 @@ const HomeScreen: React.FC = () => {
 
         const result = await orderResponse.json();
         if (result.status === 200) {
-          Alert.alert(
-            "Success",
-            "Your Order has been placed Successfully🎊",
-            [
-              { text: "OK" },
-              { text: "View Last Orders", onPress: () => 
-                // navigation.navigate('OrderHistory', { userId: userIdInDb }) 
-                Alert.alert("Last Orders will be fetched")
-            }
-            ]
-          );
+          Alert.alert("Success", "Your Order has been placed Successfully🎊", [
+            { text: "OK" },
+            {
+              text: "View Last Orders",
+              onPress: () =>
+                // navigation.navigate('OrderHistory', { userId: userIdInDb })
+                Alert.alert("Last Orders will be fetched"),
+            },
+          ]);
         } else {
           Alert.alert("Error", result.message || "Try again after sometime.");
         }
@@ -153,166 +165,186 @@ const HomeScreen: React.FC = () => {
 
   const calculateTotalWeight = () => {
     return cart.reduce((total, item) => {
-      const needFor1Kg = item.size === "250gm" ? 4 : item.size === "500gm" ? 2 : 1;
+      const needFor1Kg =
+        item.size === "250gm" ? 4 : item.size === "500gm" ? 2 : 1;
       return total + item.quantity / needFor1Kg;
     }, 0);
   };
 
   return (
-    <ScrollView style={styles.container}>
-        <View className='flex justify-between gap-4'>
-        <View className=' '>
-      <Text style={styles.title}>Vijay Shree Tea Traders</Text>
-      <Text style={styles.subtitle}>New Order</Text>
-      
-      <View style={styles.teaSection} className='flex gap-4'>
-        <View style={styles.teaType}>
-          <Text style={styles.teaTypeText}>Regular</Text>
-          <View style={styles.buttonGroup} className=''>
-            {["250gm", "500gm", "1kg"].map((size) => (
-              <View key={`Regular-${size}`}>
-                  <Button
-                    title={size}
-                    className='text-black'
-                    onPress={() => handleAddProduct("Regular", size as TeaSize)}
-                    buttonStyle={[styles.button, styles.regularButton]}
-                  />
-                  {/* <Pressable key={`Regular-${size}`} onPress={() => handleAddProduct("Regular", size as TeaSize)} style={[styles.button, styles.regularButton]} className='flex items-center justify-center font-semibold rounded-md'>
-                  <Text className='text-lg text-white'>{size}</Text>
+    <ScrollView style={styles.container} className="h-full p-2">
+      <View className="flex justify-between gap-4">
+        <View className=" rounded-xl p-3 ">
+          {/* <Text style={styles.title}>Vijay Shree Tea Traders</Text> */}
+          <Text style={styles.subtitle}>Create New Order</Text>
+          <View style={styles.teaSection} className="flex gap-4">
+            <View style={styles.teaType} className="">
+              <Text style={styles.teaTypeText} className="text-2xl">Regular</Text>
+              <View style={styles.buttonGroup} className="">
+                {["250gm", "500gm", "1000gm"].map((size) => (
+                  <View key={`Regular-${size}`}>
+                    <Button
+                      title={size == "1000gm" ? "1kg" : size}
+                      className="text-black"
+                      onPress={() =>
+                        handleAddProduct("Regular", size as TeaSize)
+                      }
+                      buttonStyle={[styles.button, styles.regularButton]}
+                    />
+                    {/* <Pressable key={`Regular-${size}`} onPress={() => handleAddProduct("Regular", size as TeaSize)} style={[styles.button, styles.regularButton]} className='flex items-center justify-center font-semibold rounded-md py-6'>
+                  <Text className='text-2xl text-white'>{size}</Text>
                   </Pressable> */}
+                  </View>
+                ))}
               </View>
-            ))}
+            </View>
+            <View style={styles.teaType}>
+              <Text style={styles.teaTypeText} className="text-2xl">Super</Text>
+              <View style={styles.buttonGroup}>
+                {["250gm", "500gm", "1000gm"].map((size) => (
+                  <Button
+                    key={`Super-${size}`}
+                    title={size == "1000gm" ? "1kg" : size}
+                    onPress={() => handleAddProduct("Super", size as TeaSize)}
+                    buttonStyle={[styles.button, styles.superButton]}
+                  />
+                ))}
+              </View>
+            </View>
           </View>
-        </View>
-        <View style={styles.teaType}>
-          <Text style={styles.teaTypeText}>Super</Text>
-          <View style={styles.buttonGroup}>
-            {["250gm", "500gm", "1kg"].map((size) => (
-              <Button
-                key={`Super-${size}`}
-                title={size}
-                onPress={() => handleAddProduct("Super", size as TeaSize)}
-                buttonStyle={[styles.button, styles.superButton]}
-              />
-            ))}
+
+          <View className="flex flex-row items-center justify-between w-full">
+            <Text className="text-lg font-semibold">Pickup Date:</Text>
+            <View className="flex flex-row items-center gap-2 justify-between ">
+              {/* <Pressable
+                className="p-4 bg-blue-500 flex flex-grow rounded-md"
+                onPress={() => setPickupDate(new Date())}
+              >
+                <Text className=" text-white">Today</Text>
+              </Pressable>
+              <Pressable
+                className="p-4 bg-blue-500 flex flex-grow rounded-md"
+                onPress={() => setPickupDate(new Date(Date.now() + 86400000))}
+              >
+                <Text className=" text-white">Tomorrow</Text>
+              </Pressable> */}
+              {showDatePicker && (
+                <DateTimePicker
+                  value={pickupDate}
+                  mode="date"
+                  display="default"
+                  className=""
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(false);
+                    if (selectedDate) setPickupDate(selectedDate);
+                  }}
+                />
+              )}
+              <Pressable
+                className="py-2 px-4 bg-blue-500 rounded-md"
+                onPress={() => setShowDatePicker((prev)=>!prev)}
+              >
+                <Text className=" text-white text-lg">Select Date</Text>
+              </Pressable>
+            </View>
           </View>
+          <View
+            style={styles.actionButtons}
+            className="flex flex-row flex-grow-0 items-center w-full gap-2 my-4"
+          >
+            <Pressable
+              onPress={handleCreateOrder}
+              disabled={isLoading}
+              className=" bg-blue-500 rounded-md py-2 px-4 flex-grow items-center flex justify-center"
+            >
+              <Text className="text-white text-lg font-semibold">
+                Create Order
+              </Text>
+            </Pressable>
+
+            {calculateTotal() > 0 && (
+              <Pressable
+                onPress={handleCancel}
+                disabled={isLoading}
+                className=" border-blue-500 border rounded-md py-2 px-4 items-center flex justify-center"
+              >
+                <Text className="text-black text-lg font-semibold">Cancel</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {calculateTotal() != 0 && (
+            <Cart
+              cart={cart}
+              total={calculateTotal()}
+              totalWeight={calculateTotalWeight()}
+              pickupDate={pickupDate}
+            />
+          )}
+
+          {/* <Button
+          title="View Last Orders"
+          onPress={() => 
+              // navigation.navigate('OrderHistory', { userId: userIdInDb })
+              Alert.alert("Last Orders will be fetched")
+          }
+        /> */}
         </View>
       </View>
-
-      <View style={styles.datePickerContainer}>
-        <Text>Pickup Date:</Text>
-        <View className='flex flex-row items-center gap-2 w-full justify-between mt-2'>
-
-        <Pressable   className='p-4 bg-blue-500 flex flex-grow rounded-md' onPress={() => setPickupDate(new Date())}><Text className=' text-white'>Today</Text></Pressable>
-        <Pressable className='p-4 bg-blue-500 flex flex-grow rounded-md'  onPress={() => setPickupDate(new Date(Date.now() + 86400000))}><Text className=' text-white'>Tomorrow</Text></Pressable>
-        <Pressable className='p-4 bg-blue-500 flex flex-grow rounded-md'  onPress={() => setShowDatePicker(true)}><Text className=' text-white'>Select Date</Text></Pressable>
-
-        </View>
-        {showDatePicker && (
-          <DateTimePicker
-            value={pickupDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) setPickupDate(selectedDate);
-            }}
-          />
-        )}
-      </View>
-
-      <Cart
-        cart={cart}
-        total={calculateTotal()}
-        totalWeight={calculateTotalWeight()}
-        pickupDate={pickupDate}
-      />
-      <Button
-          title="Create Order"
-          onPress={handleCreateOrder}
-          disabled={isLoading}
-          className='mt-4'
-        />
-
-      <View style={styles.actionButtons}>
-      <Button
-        title="View Last Orders"
-        onPress={() => 
-            // navigation.navigate('OrderHistory', { userId: userIdInDb })
-            Alert.alert("Last Orders will be fetched")
-        }
-      />
-        
-        {calculateTotal() > 0 && (
-          <Button
-            title="Cancel"
-            onPress={handleCancel}
-            disabled={isLoading}
-          />
-        )}
-      </View>
-
-      </View>
-
-      </View>
+      <SignOutButton/>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
+    // flex: 1,
+    // padding: 8,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 16,
   },
   subtitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 16,
   },
   teaSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   teaType: {
     flex: 1,
   },
   teaTypeText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    // fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 8,
   },
   buttonGroup: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   button: {
     marginBottom: 8,
-    padding: 14,
+    padding: 18,
   },
   regularButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   superButton: {
-    backgroundColor: '#FFC107',
-   
+    backgroundColor: "#FFC107",
   },
-  datePickerContainer: {
-    marginBottom: 16,
-  },
+
   actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 
 export default HomeScreen;
-

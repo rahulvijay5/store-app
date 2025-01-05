@@ -13,8 +13,8 @@ export default function Page() {
   const { user } = useUser();
 
   return (
-    <SafeAreaView className="px-4 min-h-screen">
-      <SignedIn>
+    <View className="flex-1">
+      {/* <SignedIn> */}
         {/* <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
         <Link
           href={"/UpdateDetails"}
@@ -41,7 +41,7 @@ export default function Page() {
               options={{ title: 'Order History' }} 
             />
           </Stack.Navigator> */}
-      </SignedIn>
+      {/* </SignedIn>
       <SignedOut>
         <Link
           className="p-4 bg-orange-500 w-fit m-2 rounded-lg text-white"
@@ -55,7 +55,7 @@ export default function Page() {
         >
           <Text>Sign up</Text>
         </Link>
-      </SignedOut>
-    </SafeAreaView>
+      </SignedOut> */}
+    </View>
   );
 }
